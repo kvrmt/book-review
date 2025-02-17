@@ -21,7 +21,7 @@ const Dashboard = () => {
         // Lekéri a könyveket az API-ból
         const fetchBooks = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/my-books');
+                const response = await axios.get('http://localhost:5000/api/books');
                 if (response.data && response.data.books) {
                     setBooks(response.data.books);
                 } else {
@@ -32,7 +32,6 @@ const Dashboard = () => {
                 alert('Hiba történt a könyvek lekérésekor.');
             }
         };
-        
 
         fetchBooks();
     }, []);  // Ez a useEffect csak egyszer fut le az oldal betöltésekor
@@ -68,9 +67,10 @@ const Dashboard = () => {
                                         <h6 className="card-subtitle mb-2 text-muted">{book.author}</h6>
                                         <p className="card-text">
                                             <strong>Év:</strong> {book.year} <br />
-                                            <strong>Műfaj:</strong> {book.genre}
+                                            <strong>Műfaj:</strong> {book.genre} <br />
+                                            <strong>Átlagos Értékelés:</strong> {book.averageRating ? book.averageRating.toFixed(1) : 'Nincs értékelés'} / 5
                                         </p>
-                                        <button className="btn btn-outline-primary w-100">Értékelem</button>
+                                        <button onClick={() => navigate(`/review/${book._id}`)} className="btn btn-outline-primary w-100">Értékelem</button>
                                     </div>
                                 </div>
                             </div>

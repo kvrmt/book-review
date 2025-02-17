@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', auth);
-app.use('/api/my-books',bookRoutes);
+app.use('/api/books',bookRoutes);
 
 // MongoDB kapcsolódás
 mongoose

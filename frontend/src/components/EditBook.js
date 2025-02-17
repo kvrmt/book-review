@@ -16,7 +16,7 @@ const EditBook = () => {
     useEffect(() => {
         const fetchBookDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/my-books/${bookId}`);
+                const response = await axios.get(`http://localhost:5000/api/books/${bookId}`);
                 setBook(response.data.book);
             } catch (err) {
                 setError('Hiba a könyv adatainak betöltésekor.');
@@ -39,7 +39,7 @@ const EditBook = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/my-books/edit/${bookId}`, book, {
+            await axios.put(`http://localhost:5000/api/books/edit/${bookId}`, book, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }

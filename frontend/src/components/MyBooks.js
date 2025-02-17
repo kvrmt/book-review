@@ -6,14 +6,14 @@ const MyBooks = () => {
     const [myBooks, setMyBooks] = useState([]);
     const navigate = useNavigate();
     const username = localStorage.getItem('username');
+    const token = localStorage.getItem('token'); // Token lekérése
 
     useEffect(() => {
         const fetchMyBooks = async () => {
             try {
-                const token = localStorage.getItem('token'); // Token hozzáadása a hitelesítéshez
-                const response = await axios.get('http://localhost:5000/api/my-books', {
+                const response = await axios.get('http://localhost:5000/api/books/my-books', {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,  // Az aktuális token küldése
+                        Authorization: `Bearer ${token}`,  // Az aktuális token küldése
                     },
                 });
 
@@ -35,9 +35,8 @@ const MyBooks = () => {
         if (!window.confirm('Biztosan törölni szeretnéd ezt a könyvet?')) return;
 
         try {
-            const token = localStorage.getItem('token'); // Token lekérése
-            await axios.delete(`http://localhost:5000/api/my-books/delete/${bookId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            await axios.delete(`http://localhost:5000/api/books/delete/${bookId}`, {
+                headers: { Authorization: `Bearer ${token}` },
             });            
 
             setMyBooks(myBooks.filter((book) => book._id !== bookId));
