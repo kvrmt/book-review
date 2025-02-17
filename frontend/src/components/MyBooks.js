@@ -30,6 +30,23 @@ const MyBooks = () => {
 
         fetchMyBooks();
     }, []);
+    
+    const handleDelete = async (bookId) => {
+        if (!window.confirm('Biztosan törölni szeretnéd ezt a könyvet?')) return;
+
+        try {
+            const token = localStorage.getItem('token'); // Token lekérése
+            await axios.delete(`http://localhost:5000/api/books/delete/${bookId}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });            
+
+            setMyBooks(myBooks.filter((book) => book._id !== bookId));
+            alert('Könyv sikeresen törölve!');
+        } catch (err) {
+            console.error('Hiba a könyv törlésekor:', err);
+            alert(err.response?.data?.message || 'Hiba történt a könyv törlésekor.');
+        }
+    };
 
     return (
         <div className="container mt-5">
@@ -49,8 +66,12 @@ const MyBooks = () => {
                                         <strong>Év:</strong> {book.year} <br />
                                         <strong>Műfaj:</strong> {book.genre}
                                     </p>
-                                    <button className="btn btn-secondary mb-3">Töröl</button>
-                                    <button className="btn btn-secondary mb-3">Módosít</button>
+                                    <button className="btn btn-danger me-2" onClick={() => handleDelete(book._id)}>
+                                        Töröl
+                                    </button>
+                                    <button className="btn btn-primary" onClick={() => navigate(`/edit-book/${book._id}`)}>
+                                        Módosít
+                                    </button>
                                 </div>
                             </div>
                         </div>

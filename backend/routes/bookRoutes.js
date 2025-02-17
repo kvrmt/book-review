@@ -68,4 +68,20 @@ router.post('/add', authMiddleware, async (req, res) => {
     }
 });
 
+// Könyv törlése (csak a saját könyveit törölheti a felhasználó)
+router.delete('/delete/:id', authMiddleware, async (req, res) => {
+    try {
+        const book = await Book.findOne({ _id: req.params.id, addedBy: req.user.id });
+
+        if (!book) {
+            return res.status(403).json({ message: 'Nincs jogosultságod törölni ezt a könyvet.' });
+        }
+
+        await Book.deleteOne({ _id: req.params.id });
+        res.json({ message: 'Könyv sikeresen törölve.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Hiba történt a könyv törlésekor.' });
+    }
+});
+
 module.exports = router;
