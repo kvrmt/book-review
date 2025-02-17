@@ -31,6 +31,20 @@ router.get('/', async (req, res) => {
     }
 });
 
+//Egy könyv lekérése
+router.get('/:id', async (req, res) => {
+    try {
+        const book = await Book.findById( req.params.id );
+        if (!book) {
+            return res.status(404).json({ message: 'A könyv nem található.' });
+        }
+        res.json({ book });
+    } catch (err) {
+        console.error('Hiba történt a könyv adatainak lekérésekor:', err);
+        res.status(500).json({ message: 'Hiba történt a könyv adatainak lekérésekor.' });
+    }
+});
+
 // Könyvek lekérése a bejelentkezett felhasználó által hozzáadott könyvekre
 router.get('/my-books', authMiddleware, async (req, res) => {
     try {
@@ -81,6 +95,32 @@ router.delete('/delete/:id', authMiddleware, async (req, res) => {
         res.json({ message: 'Könyv sikeresen törölve.' });
     } catch (error) {
         res.status(500).json({ message: 'Hiba történt a könyv törlésekor.' });
+    }
+});
+
+//Könyv módosítása (csak a saját könyveit módosíthatja a felhasználó)
+router.put('/edit/:id', authMiddleware, async (req, res) => {
+    try {
+        const book = await Book.findOne({ _id: req.params.id, addedBy: req.user.id });
+
+        if (!book) {
+            return res.status(403).json({ message: 'Nincs jogosultságod módosítani ezt a könyvet.' });
+        }
+
+        // A könyv adatai frissítése a beérkező adatokkal
+        const { title, author, year, genre } = req.body;
+
+        if (title) book.title = title;
+        if (author) book.author = author;
+        if (year) book.year = year;
+        if (genre) book.genre = genre;
+
+        // A módosított könyv mentése
+        await book.save();
+
+        res.json({ message: 'Könyv sikeresen módosítva.', book });
+    } catch (err) {
+        res.status(500).json({ message: 'Hiba történt a könyv módosítása közben.', error: err });
     }
 });
 

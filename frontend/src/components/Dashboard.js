@@ -21,7 +21,7 @@ const Dashboard = () => {
         // Lekéri a könyveket az API-ból
         const fetchBooks = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/books');
+                const response = await axios.get('http://localhost:5000/api/my-books');
                 if (response.data && response.data.books) {
                     setBooks(response.data.books);
                 } else {

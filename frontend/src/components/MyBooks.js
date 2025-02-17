@@ -11,7 +11,7 @@ const MyBooks = () => {
         const fetchMyBooks = async () => {
             try {
                 const token = localStorage.getItem('token'); // Token hozzáadása a hitelesítéshez
-                const response = await axios.get('http://localhost:5000/api/books/my-books', {
+                const response = await axios.get('http://localhost:5000/api/my-books', {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,  // Az aktuális token küldése
                     },
@@ -36,7 +36,7 @@ const MyBooks = () => {
 
         try {
             const token = localStorage.getItem('token'); // Token lekérése
-            await axios.delete(`http://localhost:5000/api/books/delete/${bookId}`, {
+            await axios.delete(`http://localhost:5000/api/my-books/delete/${bookId}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });            
 
@@ -69,7 +69,7 @@ const MyBooks = () => {
                                     <button className="btn btn-danger me-2" onClick={() => handleDelete(book._id)}>
                                         Töröl
                                     </button>
-                                    <button className="btn btn-primary" onClick={() => navigate(`/edit-book/${book._id}`)}>
+                                    <button className="btn btn-primary" onClick={() => navigate(`/edit/${book._id}`)}>
                                         Módosít
                                     </button>
                                 </div>
