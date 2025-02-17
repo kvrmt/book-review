@@ -43,6 +43,9 @@ const Dashboard = () => {
                 <div className="container-fluid">
                     <span className="navbar-brand">Üdvözöllek, {username}!</span>
                     <div className="d-flex ms-auto">
+                        <button onClick={() => navigate('/my-books')} className="btn btn-primary me-2">
+                            Saját könyveim
+                        </button>
                         <button onClick={() => navigate('/add-book')} className="btn btn-primary me-2">
                             Könyv hozzáadása
                         </button>

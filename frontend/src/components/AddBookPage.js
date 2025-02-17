@@ -18,9 +18,22 @@ const AddBookPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const token = localStorage.getItem('token');
+
+        const addedBy = localStorage.getItem('id');
+        const newBook = {
+            ...book,
+            addedBy,  // A hozzáadó felhasználó beállítása
+        };
+
         try {
             // POST kérés a könyv hozzáadásához
-            const response = await axios.post('http://localhost:5000/api/books/add', book);
+            const response = await axios.post('http://localhost:5000/api/books/add', newBook, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Token hozzáadása a kérésekkel
+                }
+            });
             alert(response.data.message);  // Üzenet a válaszból
             navigate('/dashboard');  // Visszairányít a dashboard oldalra
         } catch (err) {
