@@ -23,25 +23,35 @@ const authMiddleware = (req, res, next) => {
 };
 
 // Könyvek lekérése
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const books = await Book.find(); // Az összes könyv lekérése az adatbázisból
+        const userId = req.user ? req.user.id : null; // Bejelentkezett felhasználó ID-je
+
         // Az értékelések átlagának kiszámítása minden könyv esetén
-        const booksWithAverageRatings = await Promise.all(books.map(async (book) => {
+        const booksWithDetails = await Promise.all(books.map(async (book) => {
             const reviews = await Review.find({ bookId: book._id });
+
+            // Átlagos értékelés kiszámítása
             let averageRating = 0;
             if (reviews.length > 0) {
                 const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
                 averageRating = totalRating / reviews.length;
             }
+
+            // Ellenőrizzük, hogy a bejelentkezett felhasználó értékelte-e már ezt a könyvet
+            const userReview = userId ? await Review.findOne({ bookId: book._id, userId }) : null;
+
             return {
                 ...book.toObject(),
                 averageRating,  // Az átlag hozzáadása a könyvhöz
+                userHasReviewed: !!userReview, // True, ha a felhasználó már értékelt
             };
         }));
 
-        res.json({ books: booksWithAverageRatings });
+        res.json({ books: booksWithDetails });
     } catch (err) {
+        console.error('Hiba történt a könyvek lekérésekor:', err);
         res.status(500).json({ message: 'Hiba történt a könyvek lekérésekor.', error: err });
     }
 });
@@ -58,6 +68,33 @@ router.get('/my-books', authMiddleware, async (req, res) => {
         res.json({ books });
     } catch (err) {
         res.status(500).json({ message: 'Hiba történt a könyvek lekérésekor.', error: err });
+    }
+});
+
+// Értékelések lekérése a bejelentkezett felhasználó által
+router.get('/my-reviews', authMiddleware, async (req, res) => {
+    try {
+        // Keresés a 'addedBy' mező alapján, hogy csak a bejelentkezett felhasználó értékeléseit hozza vissza
+        const reviews = await Review.find({ userId: req.user.id });
+        if (reviews.length===0) {
+            return res.status(202).json({ message: 'Nincsenek értékelések a listán.' });
+        }
+
+        // Az összes könyv ID-t kiszedjük és lekérjük a könyveket
+        const bookIds = reviews.map(review => review.bookId);
+        const books = await Book.find({ _id: { $in: bookIds } });
+
+        const reviewsWithBookNames = reviews.map(review => {
+            const book = books.find(book => book._id.toString() === review.bookId.toString());
+            return {
+                ...review.toObject(),
+                bookTitle: book ? book.title : 'Ismeretlen könyv'  // Ha nincs könyv, akkor "Ismeretlen könyv"
+            };
+        });
+
+        res.json({ reviews: reviewsWithBookNames });
+    } catch (err) {
+        res.status(500).json({ message: 'Hiba történt az értékelések lekérésekor.', error: err });
     }
 });
 
@@ -98,6 +135,22 @@ router.delete('/delete/:id', authMiddleware, async (req, res) => {
     }
 });
 
+// Értékelés törlése (csak a saját értékelését törölheti a felhasználó)
+router.delete('/delete-review/:id', authMiddleware, async (req, res) => {
+    try {
+        const review = await Review.findOne({ _id: req.params.id, userId: req.user.id });
+
+        if (!review) {
+            return res.status(403).json({ message: 'Nincs jogosultságod törölni ezt az értékelést.' });
+        }
+
+        await Review.deleteOne({ _id: req.params.id });
+        res.json({ message: 'Értékelés sikeresen törölve.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Hiba történt az értékelés törlésekor.' });
+    }
+});
+
 //Könyv módosítása (csak a saját könyveit módosíthatja a felhasználó)
 router.put('/edit/:id', authMiddleware, async (req, res) => {
     try {
@@ -124,8 +177,32 @@ router.put('/edit/:id', authMiddleware, async (req, res) => {
     }
 });
 
+//Review módosítása (csak a saját review-kat módosíthatja a felhasználó)
+router.put('/edit-review/:id', authMiddleware, async (req, res) => {
+    try {
+        const review_ = await Review.findOne({ _id: req.params.id, userId: req.user.id });
+
+        if (!review_) {
+            return res.status(403).json({ message: 'Nincs jogosultságod módosítani ezt az értékelést.' });
+        }
+
+        // Az értékelés adatai frissítése a beérkező adatokkal
+        const { rating, review } = req.body;
+
+        if (rating) review_.rating = rating;
+        if (review) review_.review = review;
+
+        // A módosított könyv mentése
+        await review_.save();
+
+        res.json({ message: 'Értékelés sikeresen módosítva.', review_ });
+    } catch (err) {
+        res.status(500).json({ message: 'Hiba történt az értékelés módosítása közben.', error: err });
+    }
+});
+
 // Könyv értékelése (új dokumentumként rögzítve)
-router.post('/review/:id', authMiddleware, async (req, res) => {
+router.post('/add-review/:id', authMiddleware, async (req, res) => {
     const { rating, review } = req.body;
 
     if (!rating || !review) {
@@ -146,7 +223,6 @@ router.post('/review/:id', authMiddleware, async (req, res) => {
             userId: req.user.id,  // A bejelentkezett felhasználó ID-ja
             bookId: req.params.id,  // A könyv ID-ja
         });
-        console.log(rating);
         // Értékelés mentése
         await newReview.save();
         res.status(201).json({ message: 'Könyv értékelése sikeresen hozzáadva!' });
@@ -155,6 +231,39 @@ router.post('/review/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Hiba történt az értékelés hozzáadása közben.', error: err });
     }
 });
+
+//Egy review lekérése
+router.get('/review/:id', async (req, res) => {
+    try {
+        const review = await Review.findById( req.params.id );
+        if (!review) {
+            return res.status(404).json({ message: 'Az értékelés nem található.' });
+        }
+        res.json({ review });
+    } catch (err) {
+        console.error('Hiba történt az értékelés adatainak lekérésekor:', err);
+        res.status(500).json({ message: 'Hiba történt az értékelés adatainak lekérésekor.' });
+    }
+});
+
+//Könyv review-k lekérése
+router.get('/reviews/:id', async (req, res) => {
+    try {
+        // A könyv lekérése
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({ message: 'A könyv nem található.' });
+        }
+        const bookTitle=book.title;
+
+        const reviews = await Review.find( { bookId: req.params.id } );
+        res.json({ reviews, bookTitle });
+    } catch (err) {
+        console.error('Hiba történt az értékelések adatainak lekérésekor:', err);
+        res.status(500).json({ message: 'Hiba történt az értékelések adatainak lekérésekor.' });
+    }
+});
+
 
 //Egy könyv lekérése
 router.get('/:id', async (req, res) => {

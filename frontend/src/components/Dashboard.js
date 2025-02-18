@@ -11,8 +11,11 @@ const Dashboard = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
 
-        navigate('/');
-        window.location.reload();
+        // Időzítés, hogy a navigálás és újratöltés előtt biztosan törölve legyenek az adatok
+        setTimeout(() => {
+            navigate('/');
+            window.location.reload();
+        }, 500);  // 500 ms késleltetés
     };
 
     const username = localStorage.getItem('username');
@@ -21,7 +24,13 @@ const Dashboard = () => {
         // Lekéri a könyveket az API-ból
         const fetchBooks = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/books');
+                const token = localStorage.getItem('token'); // Token lekérése
+                const response = await axios.get('http://localhost:5000/api/books', {
+                    headers: {
+                        Authorization: `Bearer ${token}`  // Token hozzáadása a headerhez
+                    }
+                });
+        
                 if (response.data && response.data.books) {
                     setBooks(response.data.books);
                 } else {
@@ -42,6 +51,9 @@ const Dashboard = () => {
                 <div className="container-fluid">
                     <span className="navbar-brand">Üdvözöllek, {username}!</span>
                     <div className="d-flex ms-auto">
+                        <button onClick={() => navigate('/my-reviews')} className="btn btn-primary me-2">
+                            Saját értékeléseim
+                        </button>
                         <button onClick={() => navigate('/my-books')} className="btn btn-primary me-2">
                             Saját könyveim
                         </button>
@@ -56,7 +68,7 @@ const Dashboard = () => {
             </nav>
 
             <div className="container mt-5">
-                <h1 className="text-center mb-4">📚 Könyvek listája</h1>
+                <h1 className="text-center mb-4">📚 Könyvek listája 📚</h1>
                 {books.length > 0 ? (
                     <div className="row">
                         {books.map((book) => (
@@ -68,9 +80,23 @@ const Dashboard = () => {
                                         <p className="card-text">
                                             <strong>Év:</strong> {book.year} <br />
                                             <strong>Műfaj:</strong> {book.genre} <br />
-                                            <strong>Átlagos Értékelés:</strong> {book.averageRating ? book.averageRating.toFixed(1) : 'Nincs értékelés'} / 5
+                                            <strong>Átlagos Értékelés:</strong>
+                                            {book.averageRating ? (
+                                            [...Array(5)].map((_, index) => (
+                                                <span key={index} className={index < book.averageRating ? 'text-warning' : 'text-muted'}>
+                                                    ★
+                                                </span>
+                                            ))
+                                        ) : ' Nincs értékelés'}
                                         </p>
-                                        <button onClick={() => navigate(`/review/${book._id}`)} className="btn btn-outline-primary w-100">Értékelem</button>
+                                        <button 
+                                            onClick={() => navigate(`/review/${book._id}`)} 
+                                            className={`btn w-100 ${book.userHasReviewed ? 'btn-secondary' : 'btn-outline-primary'}`}
+                                            disabled={book.userHasReviewed}>
+                                            {book.userHasReviewed ? 'Már értékelted' : 'Értékelem'}
+                                        </button>
+                                        <p></p>
+                                        <button className="btn w-100 btn-outline-primary" onClick={() => navigate(`/reviews/${book._id}`)}>Értékelések megtekintése</button>
                                     </div>
                                 </div>
                             </div>

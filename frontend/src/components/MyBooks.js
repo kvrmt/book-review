@@ -49,7 +49,7 @@ const MyBooks = () => {
 
     return (
         <div className="container mt-5">
-            <h1 className="text-center mb-4">📚 {username} könyvei</h1>
+            <h1 className="text-center mb-4">📚 {username} könyvei 📚</h1>
             <button onClick={() => navigate('/dashboard')} className="btn btn-secondary mb-3">
                 Vissza a főoldalra
             </button>

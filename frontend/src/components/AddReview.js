@@ -46,7 +46,7 @@ const ReviewBook = () => {
         try {
             const token = localStorage.getItem('token');
             // Az új értékelés hozzáadása
-            await axios.post(`http://localhost:5000/api/books/review/${bookId}`, {
+            await axios.post(`http://localhost:5000/api/books/add-review/${bookId}`, {
                 rating: book.rating,  // Az értékelés
                 review: book.review,  // A vélemény
             }, {
@@ -64,7 +64,7 @@ const ReviewBook = () => {
 
     return (
         <div className="container mt-5">
-            <h1 className="text-center mb-4">Könyv értékelése</h1>
+            <h1 className="text-center mb-4">⭐ Könyv értékelése ⭐</h1>
             {error && <p className="text-danger">{error}</p>}
             <div className="card p-4">
                 <h2 className="text-center mb-4">{book.title}</h2>

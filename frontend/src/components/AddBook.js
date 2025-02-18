@@ -44,7 +44,7 @@ const AddBookPage = () => {
 
     return (
         <div className="container mt-5">
-            <h2>Új könyv hozzáadása</h2>
+            <h2>📚 Új könyv hozzáadása 📚</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label className="form-label">Cím</label>
