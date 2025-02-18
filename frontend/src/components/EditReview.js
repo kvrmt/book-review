@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
+import { useNavigate, useParams } from 'react-router-dom'; //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const EditReview = () => {
     const [review, setReview] = useState({
-        rating: '',
-        review: ''
+        rating: '', //Az értékelés 1-5
+        review: ''  //Szöveges vélemény
     });
     const [error, setError] = useState(null);
     const { reviewId } = useParams();
     const navigate = useNavigate();
 
+    //Betöltéskor a korábbi adatokat vissza adjuk, ezt módosítja a feéhasználó
     useEffect(() => {
         const fetchReviewDetails = async () => {
             try {
@@ -25,6 +26,7 @@ const EditReview = () => {
         fetchReviewDetails();
     }, [reviewId]);
 
+    //Mezők kiolvasása
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setReview((prevReview) => ({
@@ -33,6 +35,7 @@ const EditReview = () => {
         }));
     };
 
+    //Módosítás gomb akció
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -43,7 +46,7 @@ const EditReview = () => {
                 }
             });
             alert('Az értékelés sikeresen módosítva!');
-            navigate('/my-reviews');
+            navigate('/my-reviews');    //Vissza a felhasználó értékeléseihez
         } catch (err) {
             alert('Hiba történt az értékelés módosítása közben.');
             console.error(err);

@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
+import { useNavigate } from 'react-router-dom'; //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const MyReviews = () => {
     const [myReviews, setMyReviews] = useState([]);
     const navigate = useNavigate();
-    const username = localStorage.getItem('username');
+    const username = localStorage.getItem('username'); //Felhasználónév lekérése a megjelenítéshez/üdvözléshez
     const token = localStorage.getItem('token'); // Token lekérése
 
+    //Betöltéskor lekérjük a felhasználóhoz tartozó értékeléseket, hogy megjelenítsük
     useEffect(() => {
         const fetchMyReviews = async () => {
             try {
@@ -31,6 +32,7 @@ const MyReviews = () => {
         fetchMyReviews();
     }, []);
 
+    //Törlés gombra töröljük az értékelést az ID-ja alapján
     const handleDelete = async (reviewId) => {
         if (!window.confirm('Biztosan törölni szeretnéd ezt az értékelést?')) return;
 

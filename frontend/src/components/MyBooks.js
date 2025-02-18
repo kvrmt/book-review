@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
+import { useNavigate } from 'react-router-dom'; //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const MyBooks = () => {
     const [myBooks, setMyBooks] = useState([]);
@@ -8,6 +8,7 @@ const MyBooks = () => {
     const username = localStorage.getItem('username');
     const token = localStorage.getItem('token'); // Token lekérése
 
+    //Betöltéskor lekérjük a felhasználóhoz tartozó könyveket
     useEffect(() => {
         const fetchMyBooks = async () => {
             try {
@@ -31,6 +32,7 @@ const MyBooks = () => {
         fetchMyBooks();
     }, []);
     
+    //Törlés gomb megnyomásakor az adott könyv ID-je alapján törlésre kerül az adatbázisból
     const handleDelete = async (bookId) => {
         if (!window.confirm('Biztosan törölni szeretnéd ezt a könyvet?')) return;
 

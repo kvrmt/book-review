@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';    //UI
+import { useParams, useNavigate } from 'react-router-dom';  //HTTP kérésekhez - GET POST PUT DELETE
+import axios from 'axios'; //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const Reviews = () => {
     const { bookId } = useParams();
@@ -9,6 +9,7 @@ const Reviews = () => {
     const [bookTitle, setBookTitle] = useState('');
     const [error, setError] = useState(null);
 
+    //Betöltéskor lekérjük az adott könyv értékeléseit, hogy megjelenítsük
     useEffect(() => {
         const fetchReviews = async () => {
             try {
@@ -19,7 +20,7 @@ const Reviews = () => {
 
                 if (response.data && response.data.reviews) {
                     setReviews(response.data.reviews);
-                    setBookTitle(response.data.bookTitle); // Könyv címének beállítása
+                    setBookTitle(response.data.bookTitle);
                 } else {
                     setError('Nem találhatók értékelések.');
                 }

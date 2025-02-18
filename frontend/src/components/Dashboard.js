@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react'; //UI
+import { useNavigate } from 'react-router-dom';  //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -15,11 +15,12 @@ const Dashboard = () => {
         setTimeout(() => {
             navigate('/');
             window.location.reload();
-        }, 500);  // 500 ms késleltetés
+        }, 1000);  // 1000 ms késleltetés
     };
 
-    const username = localStorage.getItem('username');
+    const username = localStorage.getItem('username');  //Felhasználó nevének lekérése az üdvözléshez
 
+    //Betöltéskor lekéri a könyveket
     useEffect(() => {
         // Lekéri a könyveket az API-ból
         const fetchBooks = async () => {

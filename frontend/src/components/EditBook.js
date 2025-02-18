@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
+import { useNavigate, useParams } from 'react-router-dom'; //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const EditBook = () => {
     const [book, setBook] = useState({
@@ -13,6 +13,7 @@ const EditBook = () => {
     const { bookId } = useParams();
     const navigate = useNavigate();
 
+    //Betöltéskor lekéri a módosítani kívánt könyv adatait
     useEffect(() => {
         const fetchBookDetails = async () => {
             try {
@@ -20,13 +21,14 @@ const EditBook = () => {
                 setBook(response.data.book);
             } catch (err) {
                 setError('Hiba a könyv adatainak betöltésekor.');
-                console.error('Hiba:', err.response ? err.response.data : err);  // Debug: Kiírja a hibát részletesebben
+                console.error('Hiba:', err.response ? err.response.data : err);
             }
         };
     
         fetchBookDetails();
     }, [bookId]);
 
+    //Mezők kiolvasása
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setBook((prevBook) => ({
@@ -35,6 +37,7 @@ const EditBook = () => {
         }));
     };
 
+    //Módosítás gomb akció
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {

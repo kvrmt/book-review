@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
+import { useNavigate, useParams } from 'react-router-dom';  //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const ReviewBook = () => {
     const [book, setBook] = useState({
@@ -12,6 +12,7 @@ const ReviewBook = () => {
     const { bookId } = useParams();
     const navigate = useNavigate();
 
+    //Betöltéskor lekérjük a könyvet amihez az értékelés lesz (Csak a címét használjuk a formon)
     useEffect(() => {
         const fetchBookDetails = async () => {
             try {
@@ -29,6 +30,7 @@ const ReviewBook = () => {
         fetchBookDetails();
     }, [bookId]);
 
+    //Mezőkből érték kiolvasás
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setBook((prevBook) => ({
@@ -37,14 +39,15 @@ const ReviewBook = () => {
         }));
     };
 
+    //Rögzítés gombnyomásra
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (book.rating < 1 || book.rating > 5) {
+        if (book.rating < 1 || book.rating > 5) {//Ellenőrzés, hogy helyes érték-e
             alert('Az értékelésnek 1 és 5 között kell lennie!');
             return;
         }
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token');    //Token lekérése
             // Az új értékelés hozzáadása
             await axios.post(`http://localhost:5000/api/books/add-review/${bookId}`, {
                 rating: book.rating,  // Az értékelés
@@ -55,7 +58,7 @@ const ReviewBook = () => {
                 }
             });
             alert('Könyv értékelése sikeresen hozzáadva!');
-            navigate('/');
+            navigate('/');  //Vissza a főoldalra
         } catch (err) {
             alert('Hiba történt az értékelés hozzáadása közben.');
             console.error(err);

@@ -1,5 +1,6 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React from 'react';  //UI
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';    //HTTP kérésekhez
+//components importok
 import Auth from '../components/Auth';
 import Dashboard from '../components/Dashboard';
 import AddBookPage from '../components/AddBook';

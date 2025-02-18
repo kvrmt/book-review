@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
 
 const Auth = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLogin, setIsLogin] = useState(true);
 
+    //Regisztráció vagy bejelentkezés dinamika
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = `http://localhost:5000/api/auth/${isLogin ? 'login' : 'register'}`;
         try {
             const res = await axios.post(url, { username, password });
-            console.log(res.data);
             
             // Token és felhasználónév mentése
             localStorage.setItem('token', res.data.token);

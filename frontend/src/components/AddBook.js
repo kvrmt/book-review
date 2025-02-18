@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';    //UI
+import axios from 'axios';  //HTTP kérésekhez - GET POST PUT DELETE
+import { useNavigate } from 'react-router-dom'; //Amikor navigálni szeretnénk egy másik oldalra vagy útvonalra
 
 const AddBookPage = () => {
     const [book, setBook] = useState({
@@ -11,17 +11,18 @@ const AddBookPage = () => {
     });
     const navigate = useNavigate();
 
+    //Mezőkből érték kiolvasás
     const handleChange = (e) => {
         const { name, value } = e.target;
         setBook({ ...book, [name]: value });
     };
-
+    //Rögzítés gombnyomásra
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token');    //Felhasználó token lekérés
 
-        const addedBy = localStorage.getItem('id');
+        const addedBy = localStorage.getItem('id');//Kifogja hozzáadni? Tokenből lekérdez
         const newBook = {
             ...book,
             addedBy,  // A hozzáadó felhasználó beállítása

@@ -6,13 +6,13 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-    },
+    },//Felhasználónév, egyedi, és kötelező
     password: {
         type: String,
         required: true,
-    },
+    },//Jelszó, kötelező elem
 });
-
+//Titkosítás
 UserSchema.pre('save', async function(next) {
     if (this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, 8);
